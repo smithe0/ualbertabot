@@ -2,4 +2,4 @@ VisualStudio/Release
 VisualStudio/Debug
 bin/*
 source/*.o
-Source/UAlbertaBotModule
+Source/UAlbertaBotModule.cpp
