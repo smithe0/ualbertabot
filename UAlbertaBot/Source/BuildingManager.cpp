@@ -2,6 +2,7 @@
 #include "BuildingManager.h"
 #include "Micro.h"
 #include "ScoutManager.h"
+#include "UnitUtil.h"
 
 using namespace UAlbertaBot;
 
@@ -221,7 +222,18 @@ void BuildingManager::checkForStartedConstruction()
 }
 
 // STEP 5: IF WE ARE TERRAN, THIS MATTERS, SO: LOL
-void BuildingManager::checkForDeadTerranBuilders() {}
+void BuildingManager::checkForDeadTerranBuilders() {
+    /*if(auto b : _buildings) {
+        if (b.status != BuildingStatus::UnderConstruction && UnitUtil::Instance().onUnitDestroy(b.builderUnit)) {
+            b.status = BuildingStatus::Unassigned;
+            assignWorkersToUnassignedBuildings();
+            
+            
+            
+        }
+    }*/
+    
+}
 
 // STEP 6: CHECK FOR COMPLETED BUILDINGS
 void BuildingManager::checkForCompletedBuildings()
