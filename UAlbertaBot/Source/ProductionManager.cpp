@@ -141,6 +141,7 @@ void ProductionManager::manageBuildOrderQueue()
 	// the current item to be used
 	BuildOrderItem & currentItem = _queue.getHighestPriorityItem();
 
+
 	// while there is still something left in the _queue
 	while (!_queue.isEmpty()) 
 	{
@@ -172,15 +173,23 @@ void ProductionManager::manageBuildOrderQueue()
 		}
 
 		// if we can make the current item
-		if (producer && canMake) 
+		if (producer && canMake)
 		{
 			// create it
 			create(producer, currentItem);
 			_assignedWorkerForThisBuilding = false;
 			_haveLocationForThisBuilding = false;
 
-			// and remove it from the _queue
-			_queue.removeCurrentHighestPriorityItem();
+			//Checks if it is a tank; if so, add small unit support
+			if (currentItem.metaType.getUnitType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode){
+				_queue.removeCurrentHighestPriorityItem();
+				_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Vulture), true);
+				_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Vulture), true);
+			}
+			else{
+				// and remove it from the _queue
+				_queue.removeCurrentHighestPriorityItem();
+			}
 
 			// don't actually loop around in here
 			break;
