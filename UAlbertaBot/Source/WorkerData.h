@@ -34,7 +34,7 @@ private:
 
 	BWAPI::Unitset workers;
 	BWAPI::Unitset depots;
-
+	BWAPI::Unitset prev_workers;
 	std::map<BWAPI::Unit, enum WorkerJob>         workerJobMap;
 	std::map<BWAPI::Unit, BWAPI::Unit>  workerMineralMap;
 	std::map<BWAPI::Unit, BWAPI::Unit>  workerDepotMap;
@@ -91,6 +91,7 @@ public:
 
     BWAPI::Unitset          getMineralPatchesNearDepot(BWAPI::Unit depot);
     void                    addToMineralPatch(BWAPI::Unit unit, int num);
+	bool					WorkerData::getPreviousWorker(BWAPI::Unit unit);
 	void					drawDepotDebugInfo();
 
 	const BWAPI::Unitset & getWorkers() const { return workers; }

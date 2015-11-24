@@ -3,6 +3,7 @@
 #include "Micro.h"
 #include "ScoutManager.h"
 #include "UnitUtil.h"
+#include "WorkerManager.h"
 
 using namespace UAlbertaBot;
 
@@ -233,6 +234,15 @@ void BuildingManager::checkForDeadTerranBuilders() {
         }
     }*/
     
+	for (Building &b: _buildings) {
+		if (b.status != BuildingStatus::UnderConstruction && WorkerManager::Instance().checkPreviousWorkers(b.builderUnit)==true) {
+			b.status = BuildingStatus::Unassigned;
+			assignWorkersToUnassignedBuildings();
+
+
+		}
+	}
+
 }
 
 // STEP 6: CHECK FOR COMPLETED BUILDINGS
