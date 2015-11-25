@@ -7,10 +7,68 @@ TankManager::TankManager()
 { 
 }
 
+// if not enough tanks have been placed on base defense, then get the tanks
+void TankManager::recruitTankBaseDefense( int siegeTankDefenseCount, const BWTA::Chokepoint *baseEntrance,
+	BWAPI::Unitset & defenseTanks, const int NUM_OF_SIEGE_DEFENDERS){
+	BWAPI::Unitset & allTanks = const_cast<BWAPI::Unitset&>(getUnits());
+
+	// look for close tanks to recruit until we have enough siege defenders
+	while (siegeTankDefenseCount < NUM_OF_SIEGE_DEFENDERS){
+
+		double closestDistance = std::numeric_limits<double>::max(); // set an initial high max distance
+		BWAPI::Unit & closestTank{ const_cast<BWAPI::Unit&>(*allTanks.begin()) }; // set first tank in set to closest for now
+		for (auto & tank : allTanks){
+			if (baseEntrance->getCenter().getDistance(tank->getPosition()) < closestDistance 
+					&& defenseTanks.find(tank)==defenseTanks.end()){
+				defenseTanks.insert(tank);
+				siegeTankDefenseCount++;
+				allTanks.erase(tank);
+				break;
+			}
+		}
+	}
+
+	// move the tanks to the base entrance
+	auto defensivePost = baseEntrance->getSides();
+	for (auto & _tank : defenseTanks){
+		BWAPI::UnitCommand::M
+	}
+
+}
+
+
 void TankManager::executeMicro(const BWAPI::Unitset & targets) 
 {
+	const int NUM_OF_SIEGE_DEFENDERS = 2; // number of siege mode tanks near entrance ( can change to liking ) 
 	const BWAPI::Unitset & tanks = getUnits();
+	BWAPI::Unitset & defenseTanks{}; // holds tanks near entrance in defensive siege mode
 
+	// Get the chokepoint closest to our base ( base entrance )
+	BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
+
+	// Check if we have atleast 2 siege tanks already set up at our base entrance
+	int tankSiegeDefenseCount = 0;
+	for (auto & _tank : tanks){
+
+		if (baseEntrance->getCenter().getDistance(_tank->getPosition()) < 64){
+			if (! _tank->isSieged() && _tank->canSiege() ){
+				BWAPI::UnitCommand::siege(_tank);
+			}
+			++tankSiegeDefenseCount;
+			defenseTanks.insert(_tank);
+		}
+
+		if (tankSiegeDefenseCount >= NUM_OF_SIEGE_DEFENDERS){
+			break;
+		}
+	}
+
+	// if we have less than NUM_OF_SIEGE_DEFENDERS tanks in siege mode at the entrance, then recruit more
+	if (tankSiegeDefenseCount < NUM_OF_SIEGE_DEFENDERS){
+		recruitTankBaseDefense(tankSiegeDefenseCount, baseEntrance, defenseTanks, NUM_OF_SIEGE_DEFENDERS);
+	}
+	
 	// figure out targets
 	BWAPI::Unitset tankTargets;
     std::copy_if(targets.begin(), targets.end(), std::inserter(tankTargets, tankTargets.end()), 
@@ -19,15 +77,10 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
     int siegeTankRange = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() - 32;
     bool haveSiege = BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode);
 
-
-
-	// for each zealot
+	// for each tank
 	for (auto & tank : tanks)
 	{
-		// train sub units such as scarabs or interceptors
-		//trainSubUnits(rangedUnit);
-
-        bool tankNearChokepoint = false; 
+		bool tankNearChokepoint = false;
         for (auto & choke : BWTA::getChokepoints())
         {
             if (choke->getCenter().getDistance(tank->getPosition()) < 64)
@@ -35,7 +88,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
                 tankNearChokepoint = true;
                 break;
             }
-        }
+		}
 
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend) 
@@ -43,7 +96,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 			// if there are targets
 			if (!tankTargets.empty())
 			{
-				// find the best target for this zealot
+				// find the best target for this tank
 				BWAPI::Unit target = getTarget(tank, tankTargets);
 
                 if (target && Config::Debug::DrawUnitTargetInfo) 
@@ -95,7 +148,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 	}
 }
 
-// get a target for the zealot to attack
+// get a target for the tank to attack
 BWAPI::Unit TankManager::getTarget(BWAPI::Unit tank, const BWAPI::Unitset & targets)
 {
 	int bestPriorityDistance = 1000000;
