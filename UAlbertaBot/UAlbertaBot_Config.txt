@@ -8,10 +8,10 @@
         
     "BWAPI" : 
     {
-        "SetLocalSpeed"             : 5,
+        "SetLocalSpeed"             : 10,
         "SetFrameSkip"              : 0,
         "UserInput"                 : true,
-        "CompleteMapInformation"    : false
+        "CompleteMapInformation"    : true
     },
     
     "Micro" :
