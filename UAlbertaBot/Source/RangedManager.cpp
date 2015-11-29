@@ -26,6 +26,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 		// train sub units such as scarabs or interceptors
 		//trainSubUnits(rangedUnit);
 
+		
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend) 
         {
@@ -61,12 +62,60 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
-				// if we're not near the order position
-				if (rangedUnit->getDistance(order.getPosition()) > 100)
+
+				//Lay spider mines in chokepoints
+				if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Vulture && rangedUnit->getSpiderMineCount() > 0 && unitNearChokepoint(rangedUnit))
 				{
-					// move to it
-					Micro::SmartAttackMove(rangedUnit, order.getPosition());
+					Micro::SmartLaySpiderMine(rangedUnit, rangedUnit->getPosition());
+					/*
+					bool nearChoke = false;
+					BWAPI::Position chokeMid = rangedUnit->getPosition();
+					std::pair<BWAPI::Position, BWAPI:: Position> chokeSides;
+
+					for (BWTA::Chokepoint * choke : BWTA::getChokepoints())
+					{
+						if (rangedUnit->getDistance(choke->getCenter()) < 80)
+						{
+							nearChoke = true;
+							chokeMid = choke->getCenter();
+							chokeSides = choke->getSides();
+							break;
+						}
+					}
+
+					if (nearChoke){
+						Micro::SmartLaySpiderMine(rangedUnit, rangedUnit->getPosition());
+						
+						const BWAPI::Unitset & mineUnits = getUnits();
+						for (auto &mineUnit : mineUnits){
+							if (mineUnit->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine){
+								BWAPI::Broodwar->printf("It works! :D");
+							}
+						}
+						
+					}
+					else{
+
+						// if we're not near the order position
+						if (rangedUnit->getDistance(order.getPosition()) > 100)
+						{
+							// move to it
+							Micro::SmartAttackMove(rangedUnit, order.getPosition());
+						}
+					}
+					*/
 				}
+				
+				else
+				{
+					// if we're not near the order position
+					if (rangedUnit->getDistance(order.getPosition()) > 100)
+					{
+						// move to it
+						Micro::SmartAttackMove(rangedUnit, order.getPosition());
+					}
+				}
+
 			}
 		}
 	}
