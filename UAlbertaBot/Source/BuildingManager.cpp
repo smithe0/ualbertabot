@@ -221,7 +221,18 @@ void BuildingManager::checkForStartedConstruction()
 }
 
 // STEP 5: IF WE ARE TERRAN, THIS MATTERS, SO: LOL
-void BuildingManager::checkForDeadTerranBuilders() {}
+void BuildingManager::checkForDeadTerranBuilders() {
+	for (auto & b : _buildings)
+	{
+		if (b.status == BuildingStatus::Assigned && WorkerManager::Instance().isBuilder(b.buildingUnit) == false && b.status == BuildingStatus::UnderConstruction )
+		{
+			b.status = BuildingStatus::Unassigned;
+			b.builderUnit = nullptr;
+		}
+
+	}
+
+}
 
 // STEP 6: CHECK FOR COMPLETED BUILDINGS
 void BuildingManager::checkForCompletedBuildings()
@@ -450,3 +461,24 @@ void BuildingManager::removeBuildings(const std::vector<Building> & toRemove)
         }
     }
 }
+void BuildingManager::SweepEnemyBase(){
+	for (auto & u : BWAPI::Broodwar->self()->getUnits()){
+		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) {
+			if (u->getEnergy() >= 150) {
+
+				BWAPI::UnitCommand::useTech(u, BWAPI::TechTypes::Scanner_Sweep, BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation()));
+			}
+		}
+	}
+}
+void BuildingManager::SweepAroundUnit(BWAPI::Unit unit){
+	for (auto & u : BWAPI::Broodwar->self()->getUnits()){
+		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) {
+			if (u->getEnergy() >= 50) {
+
+				BWAPI::UnitCommand::useTech(u, BWAPI::TechTypes::Scanner_Sweep, unit->getPosition());
+			}
+		}
+	}
+}
+

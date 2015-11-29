@@ -42,7 +42,8 @@ public:
     void                addBuildingTask(BWAPI::UnitType type,BWAPI::TilePosition desiredLocation,bool isGasSteal);
     void                drawBuildingInformation(int x,int y);
     BWAPI::TilePosition getBuildingLocation(const Building & b);
-
+	void				SweepEnemyBase();
+	void				SweepAroundUnit(BWAPI::Unit unit);
     int                 getReservedMinerals();
     int                 getReservedGas();
 
