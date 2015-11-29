@@ -30,7 +30,6 @@ protected:
 	SquadOrder			order;
 
 	virtual void        executeMicro(const BWAPI::Unitset & targets) = 0;
-	//virtual void		executeSiegeDefense(const BWAPI::Unitset & targets) = 0;
 	bool                checkPositionWalkable(BWAPI::Position pos);
 	void                drawOrderText();
 	bool                unitNearEnemy(BWAPI::Unit unit);

@@ -69,7 +69,7 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 
 	// the following block of code attacks all units on the way to the order position
 	// we want to do this if the order is attack, defend, or harass
-	if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend) 
+	if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::BaseDefense) 
 	{
         // if this is a worker defense force
         if (_units.size() == 1 && (*_units.begin())->getType().isWorker())
