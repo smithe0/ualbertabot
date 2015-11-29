@@ -25,6 +25,9 @@ void CombatCommander::initializeSquads()
 	_squadData.addSquad("MainAttack", Squad("MainAttack", mainAttackOrder, AttackPriority));
 
     BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
+	SquadOrder tankBaseDefense(SquadOrderTypes::BaseDefense, baseEntrance->getCenter(), 100, "Defend base entrance");
+	_squadData.addSquad("BaseDefense", Squad("BaseDefense", tankBaseDefense, BaseDefensePriority));
 
     // the scout defense squad will handle chasing the enemy worker scout
     SquadOrder enemyScoutDefense(SquadOrderTypes::Defend, ourBasePosition, 900, "Get the scout");
@@ -36,6 +39,12 @@ void CombatCommander::initializeSquads()
         SquadOrder zealotDrop(SquadOrderTypes::Drop, ourBasePosition, 900, "Wait for transport");
         _squadData.addSquad("Drop", Squad("Drop", zealotDrop, DropPriority));
     }
+
+	// the base defense squad that consists of tanks in siege mode
+	//BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	//BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
+	//SquadOrder tankBaseDefense(SquadOrderTypes::BaseDefense, baseEntrance->getCenter(), 100, "Defend base entrance");
+	//_squadData.addSquad("BaseDefense", Squad("BaseDefense", tankBaseDefense, BaseDefensePriority));
 
     _initialized = true;
 }
@@ -65,6 +74,7 @@ void CombatCommander::update(const BWAPI::Unitset & combatUnits)
         updateIdleSquad();
         updateDropSquads();
         updateScoutDefenseSquad();
+		updateBaseDefenseSquad();
 		updateDefenseSquads();
 		updateAttackSquads();
 	}
@@ -83,6 +93,51 @@ void CombatCommander::updateIdleSquad()
             idleSquad.addUnit(unit);
         }
     }
+}
+
+void CombatCommander::updateBaseDefenseSquad()
+{
+	Squad & baseDefenseSquad = _squadData.getSquad("BaseDefense");
+	const int NUM_OF_SIEGE_DEFENDERS = 3; // number of siege mode tanks near entrance ( can change to liking ) 
+	auto  & baseDefenseUnits = baseDefenseSquad.getUnits();
+
+	if (_combatUnits.empty())
+	{
+		return;
+	}
+
+	// if we have not recruited enough siege tanks for base defence, then get more
+	if (baseDefenseUnits.size() < NUM_OF_SIEGE_DEFENDERS)
+	{
+		int currentNumSiegeDef = baseDefenseUnits.size();
+		while (currentNumSiegeDef < NUM_OF_SIEGE_DEFENDERS)
+		{
+			auto nearestSiegeTank = findClosestDefender(baseDefenseSquad, getBaseDefenseLocation(), false);
+			if (nearestSiegeTank){
+				
+				// check to make sure nearestSiegeTank is in fact actually a tank;
+				// too lazy to implement a whole new nearestTankDefender function,
+				// and since our strategy is always tank_push this won't end up being
+				// terribly inefficient as it seems
+				if (nearestSiegeTank->getType() != BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode ||
+					nearestSiegeTank->getType() != BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
+				{
+					continue;
+				}
+				_squadData.assignUnitToSquad(nearestSiegeTank, baseDefenseSquad);
+				currentNumSiegeDef++;
+			}
+			
+			// if no siegeTank was found then we won't find another , so break out of loop
+			else
+			{
+				break;
+			}
+		}
+	}
+
+	SquadOrder baseDefenseOrder(SquadOrderTypes::BaseDefense, getBaseDefenseLocation(), 100, "Defend base entrace");
+	baseDefenseSquad.setSquadOrder(baseDefenseOrder);
 }
 
 void CombatCommander::updateAttackSquads()
@@ -457,6 +512,13 @@ BWAPI::Unit CombatCommander::findClosestDefender(const Squad & defenseSquad, BWA
 BWAPI::Position CombatCommander::getDefendLocation()
 {
 	return BWTA::getRegion(BWTA::getStartLocation(BWAPI::Broodwar->self())->getTilePosition())->getCenter();
+}
+
+BWAPI::Position CombatCommander::getBaseDefenseLocation()
+{
+	BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
+	return baseEntrance->getCenter();
 }
 
 void CombatCommander::drawSquadInformation(int x, int y)

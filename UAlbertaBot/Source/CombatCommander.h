@@ -15,6 +15,7 @@ class CombatCommander
     bool            _initialized;
 
     void            updateScoutDefenseSquad();
+	void			updateBaseDefenseSquad();
 	void            updateDefenseSquads();
 	void            updateAttackSquads();
     void            updateDropSquads();
@@ -27,6 +28,7 @@ class CombatCommander
 
 	BWAPI::Position getDefendLocation();
     BWAPI::Position getMainAttackLocation();
+	BWAPI::Position getBaseDefenseLocation();
 
     void            initializeSquads();
     void            verifySquadUniqueMembership();
