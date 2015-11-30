@@ -64,35 +64,28 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			{
 
 				//Lay spider mines in chokepoints
-				if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Vulture && rangedUnit->getSpiderMineCount() > 0 && unitNearChokepoint(rangedUnit))
+				if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Vulture && rangedUnit->getSpiderMineCount() > 0)
 				{
-					Micro::SmartLaySpiderMine(rangedUnit, rangedUnit->getPosition());
-					/*
+					
 					bool nearChoke = false;
 					BWAPI::Position chokeMid = rangedUnit->getPosition();
-					std::pair<BWAPI::Position, BWAPI:: Position> chokeSides;
+
+					BWAPI::Position base = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+					BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(base);
+					
 
 					for (BWTA::Chokepoint * choke : BWTA::getChokepoints())
 					{
-						if (rangedUnit->getDistance(choke->getCenter()) < 80)
+						if (rangedUnit->getDistance(choke->getCenter()) < 80 && choke->getCenter() != baseEntrance->getCenter())
 						{
 							nearChoke = true;
 							chokeMid = choke->getCenter();
-							chokeSides = choke->getSides();
 							break;
 						}
 					}
 
 					if (nearChoke){
-						Micro::SmartLaySpiderMine(rangedUnit, rangedUnit->getPosition());
-						
-						const BWAPI::Unitset & mineUnits = getUnits();
-						for (auto &mineUnit : mineUnits){
-							if (mineUnit->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine){
-								BWAPI::Broodwar->printf("It works! :D");
-							}
-						}
-						
+						Micro::SmartLaySpiderMine(rangedUnit, rangedUnit->getPosition());		
 					}
 					else{
 
@@ -103,7 +96,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 							Micro::SmartAttackMove(rangedUnit, order.getPosition());
 						}
 					}
-					*/
+					
 				}
 				
 				else

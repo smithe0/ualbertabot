@@ -184,29 +184,10 @@ void Micro::SmartLaySpiderMine(BWAPI::Unit unit, BWAPI::Position pos)
 
 	if (!unit->canUseTechPosition(BWAPI::TechTypes::Spider_Mines, pos))
 	{
-		/*
-		BWAPI::Broodwar->printf("Looking for new position");
-		BWAPI::Position tmp;
-		bool foundPos = false;
-		for (int i = 0; i < 360; ++i){
-			tmp.x = (int)(cos(i*3.14159265359 / 180) * 30 + pos.x);
-			tmp.y = (int)(sin(i*3.14159265359 / 180) * 30 + pos.y);
-			if (unit->canUseTechPosition(BWAPI::TechTypes::Spider_Mines, tmp)){
-				pos = tmp;
-				foundPos = true;
-				break;
-			}
-			else BWAPI::Broodwar->printf("Not here");
-		}
-
-		if (!foundPos){
-			return;
-		}
-		*/
 		return;
 	}
 	
-	BWAPI::Broodwar->printf("Spider Mine Planted");
+	//BWAPI::Broodwar->printf("Spider Mine Planted");
 	unit->useTech(BWAPI::TechTypes::Spider_Mines, pos);
 	
 }
