@@ -1,4 +1,5 @@
 #include "ProductionManager.h"
+#include "InformationManager.h"
 
 using namespace UAlbertaBot;
 
@@ -47,7 +48,26 @@ void ProductionManager::update()
 {
 	// check the _queue for stuff we can build
 	manageBuildOrderQueue();
-    
+
+	InformationManager im = InformationManager::Instance();
+	int numBunkers = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Bunker);
+	int numMarines = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Marine);
+	int numBarracks = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Barracks);
+
+	//If against zerg rush early bunkers in case of zerg rush
+	if (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Enum::Zerg && BWAPI::Broodwar->getFrameCount() < 5000) {
+		//Check to see if we haven't built 2 bunkers yet
+		if(numBunkers < 2) {
+			buildBunker();
+		}
+		
+	}
+	else {
+		if (numBunkers == 0){
+			buildBunker();
+		}
+	}
+
 	// if nothing is currently building, get a new goal from the strategy manager
 	if ((_queue.size() == 0) && (BWAPI::Broodwar->getFrameCount() > 10))
 	{
@@ -126,6 +146,76 @@ void ProductionManager::onUnitDestroy(BWAPI::Unit unit)
 			{
 				performBuildOrderSearch();
 			}
+		}
+	}
+}
+
+void ProductionManager::buildBunker() {
+	BWAPI::Position base = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint *entrance = BWTA::getNearestChokepoint(base); 
+	MetaType bunker = MetaType(BWAPI::UnitTypes::Terran_Bunker);
+	BWAPI::Unit producer = ProductionManager::Instance().getProducer(bunker, entrance->getCenter());
+
+	int numBarracks = BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Barracks);
+	bool canMake = canMakeNow(producer, bunker);
+
+	Building b(bunker.getUnitType(), BWAPI::TilePosition(entrance->getCenter()));
+	b.isGasSteal = false;
+
+	// set the producer as the closest worker, but do not set its job yet
+	producer = WorkerManager::Instance().getBuilder(b, false);
+	// get a possible building location for the building
+	
+	if (!_haveLocationForThisBuilding)
+	{
+		_predictedTilePosition = BuildingManager::Instance().getBuildingLocation(b);
+	}
+
+	if (_predictedTilePosition != BWAPI::TilePositions::None)
+	{
+		_haveLocationForThisBuilding = true;
+	}
+
+	if (producer && canMake && (numBarracks > 0))
+	{
+		// create it
+		create(producer, BuildOrderItem(bunker, 1, true));
+		_assignedWorkerForThisBuilding = false;
+		_haveLocationForThisBuilding = false;
+
+		// draw a box where the building will be placed
+		int x1 = _predictedTilePosition.x * 32;
+		int x2 = x1 + (b.type.tileWidth()) * 32;
+		int y1 = _predictedTilePosition.y * 32;
+		int y2 = y1 + (b.type.tileHeight()) * 32;
+		if (Config::Debug::DrawWorkerInfo)
+		{
+			BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Blue, false);
+		}
+
+		// where we want the worker to walk to
+		BWAPI::Position walkToPosition = BWAPI::Position(x1 + (b.type.tileWidth() / 2) * 32, y1 + (b.type.tileHeight() / 2) * 32);
+
+		// compute how many resources we need to construct this building
+		int mineralsRequired = std::max(0, b.type.mineralPrice() - getFreeMinerals());
+		int gasRequired = std::max(0, b.type.gasPrice() - getFreeGas());
+
+		// get a candidate worker to move to this location
+		BWAPI::Unit moveWorker = WorkerManager::Instance().getMoveWorker(walkToPosition);
+
+		// Conditions under which to move the worker: 
+		//		- there's a valid worker to move
+		//		- we haven't yet assigned a worker to move to this location
+		//		- the build position is valid
+		//		- we will have the required resources by the time the worker gets there
+		if (moveWorker && _haveLocationForThisBuilding && !_assignedWorkerForThisBuilding && (_predictedTilePosition != BWAPI::TilePositions::None) &&
+			WorkerManager::Instance().willHaveResources(mineralsRequired, gasRequired, moveWorker->getDistance(walkToPosition)))
+		{
+			// we have assigned a worker
+			_assignedWorkerForThisBuilding = true;
+
+			// tell the worker manager to move this worker
+			WorkerManager::Instance().setMoveWorker(mineralsRequired, gasRequired, walkToPosition);
 		}
 	}
 }
@@ -342,7 +432,14 @@ void ProductionManager::create(BWAPI::Unit producer, BuildOrderItem & item)
         && !t.getUnitType().isAddon())
     {
         // send the building task to the building manager
-        BuildingManager::Instance().addBuildingTask(t.getUnitType(), BWAPI::Broodwar->self()->getStartLocation(), item.isGasSteal);
+		if (t.getUnitType() == BWAPI::UnitTypes::Terran_Bunker)
+		{
+			BWAPI::TilePosition tp = BWAPI::TilePosition(BWTA::getNearestChokepoint(BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()))->getCenter());
+			BuildingManager::Instance().addBuildingTask(t.getUnitType(), tp, item.isGasSteal);
+		}
+		else {
+			BuildingManager::Instance().addBuildingTask(t.getUnitType(), BWAPI::Broodwar->self()->getStartLocation(), item.isGasSteal);
+		}
     }
     else if (t.getUnitType().isAddon())
     {

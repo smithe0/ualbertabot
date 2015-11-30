@@ -24,10 +24,11 @@ class CombatCommander
 
 	BWAPI::Unit     findClosestDefender(const Squad & defenseSquad, BWAPI::Position pos, bool flyingDefender);
     BWAPI::Unit     findClosestWorkerToTarget(BWAPI::Unitset & unitsToAssign, BWAPI::Unit target);
+	BWAPI::Unit		findClosestMarine(const Squad & defenseSquad, BWAPI::Position pos);
 
 	BWAPI::Position getDefendLocation();
     BWAPI::Position getMainAttackLocation();
-
+	
     void            initializeSquads();
     void            verifySquadUniqueMembership();
     void            assignFlyingDefender(Squad & squad);
@@ -37,6 +38,7 @@ class CombatCommander
 
     void            updateDefenseSquadUnits(Squad & defenseSquad, const size_t & flyingDefendersNeeded, const size_t & groundDefendersNeeded);
     int             defendWithWorkers();
+	void			updateBunkerSquads();
 
     int             numZerglingsInOurBase();
     bool            beingBuildingRushed();

@@ -33,7 +33,7 @@ BWAPI::Position MicroManager::calcCenter() const
 void MicroManager::execute(const SquadOrder & inputOrder)
 {
 	// Nothing to do if we have no units
-	if (_units.empty() || !(inputOrder.getType() == SquadOrderTypes::Attack || inputOrder.getType() == SquadOrderTypes::Defend))
+	if (_units.empty() || !(inputOrder.getType() == SquadOrderTypes::Attack || inputOrder.getType() == SquadOrderTypes::Defend || inputOrder.getType() == SquadOrderTypes::BunkerSquad))
 	{
 		return;
 	}
@@ -45,7 +45,7 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 	BWAPI::Unitset nearbyEnemies;
 
 	// if the order is to defend, we only care about units in the radius of the defense
-	if (order.getType() == SquadOrderTypes::Defend)
+	if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::BunkerSquad)
 	{
 		MapGrid::Instance().GetUnits(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
 	
@@ -63,7 +63,7 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 
 	// the following block of code attacks all units on the way to the order position
 	// we want to do this if the order is attack, defend, or harass
-	if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend) 
+	if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::BunkerSquad) 
 	{
         // if this is a worker defense force
         if (_units.size() == 1 && (*_units.begin())->getType().isWorker())
@@ -74,7 +74,7 @@ void MicroManager::execute(const SquadOrder & inputOrder)
         else
         {
             // if this is a defense squad then we care about all units in the area
-            if (order.getType() == SquadOrderTypes::Defend)
+            if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::BunkerSquad)
             {
                 executeMicro(nearbyEnemies);
             }
