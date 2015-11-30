@@ -5,9 +5,10 @@ using namespace UAlbertaBot;
 
 const size_t IdlePriority = 0;
 const size_t AttackPriority = 1;
-const size_t BaseDefensePriority = 2;
-const size_t ScoutDefensePriority = 3;
-const size_t DropPriority = 4;
+const size_t BunkerSquadPriority = 2;
+const size_t BaseDefensePriority = 3;
+const size_t ScoutDefensePriority = 4;
+const size_t DropPriority = 5;
 
 CombatCommander::CombatCommander() 
     : _initialized(false)
@@ -33,6 +34,11 @@ void CombatCommander::initializeSquads()
     // the scout defense squad will handle chasing the enemy worker scout
     SquadOrder enemyScoutDefense(SquadOrderTypes::Defend, ourBasePosition, 900, "Get the scout");
     _squadData.addSquad("ScoutDefense", Squad("ScoutDefense", enemyScoutDefense, ScoutDefensePriority));
+
+	// the bunker squad will defend the base
+	BWTA::Chokepoint *entrance = BWTA::getNearestChokepoint(ourBasePosition);
+	SquadOrder mainBunkerSquad(SquadOrderTypes::BunkerSquad, entrance->getCenter(), 300, "Sit in bunker");
+	_squadData.addSquad("BunkerDefense", Squad("BunkerDefense", mainBunkerSquad, BunkerSquadPriority));
 
     // add a drop squad if we are using a drop strategy
     if (Config::Strategy::StrategyName == "Protoss_Drop")
@@ -72,6 +78,7 @@ void CombatCommander::update(const BWAPI::Unitset & combatUnits)
 		updateBaseDefenseSquad();
 		updateDefenseSquads();
 		updateAttackSquads();
+		updateBunkerSquads();
 	}
 
 	_squadData.update();
@@ -156,6 +163,35 @@ void CombatCommander::updateAttackSquads()
 		SquadOrder mainAttackOrder(SquadOrderTypes::Regroup, getDefendLocation(), 800, "Gather strength");
 		mainAttackSquad.setSquadOrder(mainAttackOrder);
 	}
+}
+
+void CombatCommander::updateBunkerSquads()
+{
+	Squad & mainBunkerSquad = _squadData.getSquad("BunkerDefense");
+	const int numMarines = 2;
+	auto & currentCount = mainBunkerSquad.getUnits();
+
+	if (_combatUnits.empty()){
+		return;
+	}
+
+	BWAPI::Position base = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint *entrance = BWTA::getNearestChokepoint(base);
+
+	if (currentCount.size() < numMarines){
+		int currentNumberMarines = currentCount.size();
+		while (currentNumberMarines < numMarines){
+			auto nearestMarine = findClosestMarine(mainBunkerSquad, entrance->getCenter());
+			if (nearestMarine) {
+				_squadData.assignUnitToSquad(nearestMarine, mainBunkerSquad);
+				currentNumberMarines++;
+			} else {
+				break;
+			}
+		}
+	}
+	SquadOrder mainBunkerOrder(SquadOrderTypes::BunkerSquad, entrance->getCenter(), 200, "Bunker Defense, Go team!");
+	mainBunkerSquad.setSquadOrder(mainBunkerOrder);
 }
 
 void CombatCommander::updateDropSquads()
@@ -529,6 +565,33 @@ BWAPI::Unit CombatCommander::findClosestDefender(const Squad & defenseSquad, BWA
             closestDefender = unit;
             minDistance = dist;
         }
+	}
+
+	return closestDefender;
+}
+
+BWAPI::Unit CombatCommander::findClosestMarine(const Squad & defenseSquad, BWAPI::Position pos)
+{
+	BWAPI::Unit closestDefender = nullptr;
+	double minDistance = std::numeric_limits<double>::max();
+
+	for (auto & unit : _combatUnits)
+	{
+		if (unit->getType() != BWAPI::UnitTypes::Terran_Marine){
+			continue;
+		}
+
+		if (!_squadData.canAssignUnitToSquad(unit, defenseSquad))
+		{
+			continue;
+		}
+
+		double dist = unit->getDistance(pos);
+		if (!closestDefender || (dist < minDistance))
+		{
+			closestDefender = unit;
+			minDistance = dist;
+		}
 	}
 
 	return closestDefender;

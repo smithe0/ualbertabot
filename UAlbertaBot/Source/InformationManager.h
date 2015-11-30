@@ -67,6 +67,7 @@ public:
     void                    drawUnitInformation(int x,int y);
     void                    drawMapInformation();
 
+	BWAPI::Player			getEnemy();
     const UnitData &        getUnitData(BWAPI::Player player) const;
 };
 }
