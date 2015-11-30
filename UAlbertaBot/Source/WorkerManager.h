@@ -35,6 +35,7 @@ public:
 
     void        finishedWithCombatWorkers();
 
+	bool		checkPreviousWorkers(BWAPI::Unit unit);
     void        drawResourceDebugInfo();
     void        updateWorkerStatus();
     void        drawWorkerInformation(int x,int y);

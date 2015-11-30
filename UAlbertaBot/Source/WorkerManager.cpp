@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "WorkerManager.h"
 #include "Micro.h"
+#include "WorkerData.h"
 
 using namespace UAlbertaBot;
 
@@ -637,7 +638,12 @@ void WorkerManager::onUnitDestroy(BWAPI::Unit unit)
 		rebalanceWorkers();
 	}
 }
-
+bool WorkerManager::checkPreviousWorkers(BWAPI::Unit unit) {
+	if (workerData.getPreviousWorker(unit) == true){
+		return true;
+	}
+	return false;
+}
 void WorkerManager::drawResourceDebugInfo() 
 {
     if (!Config::Debug::DrawResourceInfo)

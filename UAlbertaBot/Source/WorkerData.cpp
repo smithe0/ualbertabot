@@ -20,6 +20,7 @@ void WorkerData::workerDestroyed(BWAPI::Unit unit)
 
 	clearPreviousJob(unit);
 	workers.erase(unit);
+	prev_workers.insert(unit);
 }
 
 void WorkerData::addWorker(BWAPI::Unit unit)
@@ -544,7 +545,13 @@ char WorkerData::getJobCode(BWAPI::Unit unit)
 	if (j == WorkerData::Scout) return 'S';
 	return 'X';
 }
-
+bool WorkerData::getPreviousWorker(BWAPI::Unit unit) {
+	if (!unit) { return false; }
+	if (prev_workers.find(unit) == prev_workers.end()){
+		return true;
+	}
+	return false;
+}
 void WorkerData::drawDepotDebugInfo()
 {
 	for (auto & depot : depots)
