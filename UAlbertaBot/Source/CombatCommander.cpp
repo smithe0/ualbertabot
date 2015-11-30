@@ -111,7 +111,6 @@ void CombatCommander::updateBaseDefenseSquad()
 			auto nearestSiegeTank = findClosestSiegeDefender(baseDefenseSquad, getBaseDefenseLocation());
 			if (nearestSiegeTank)
 			{
-				BWAPI::Broodwar->printf("LOL.");
 				_squadData.assignUnitToSquad(nearestSiegeTank, baseDefenseSquad);
 				currentNumSiegeDef++;
 			}

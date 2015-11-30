@@ -29,7 +29,7 @@ void TankManager::executeSiegeDefense(const BWAPI::Unitset & targets)
 		if (order.getType() == SquadOrderTypes::BaseDefense)
 		{
 			// if the tanks distance to the base entrance is > 64, then move the tank into position 
-			if (tank->getDistance(baseEntrance->getCenter()) > 64)
+			if (tank->getDistance(baseEntrance->getCenter()) > 170)
 			{
 				if (tank->isSieged() && tank->canUnsiege())
 				{
@@ -38,7 +38,18 @@ void TankManager::executeSiegeDefense(const BWAPI::Unitset & targets)
 
 				else if (tank->canMove())
 				{
-					tank->move(baseEntrance->getCenter());
+					std::mt19937 rng;
+					std::uniform_int_distribution<int> dist(0, std::numeric_limits<int>::max());
+					int rand = dist(rng);
+					assert(rand >= 0 && rand < std::numeric_limits<int>::max());
+					if (rand % 2 == 0)
+					{
+						tank->move(baseEntrance->getSides().first);
+					}
+					else
+					{
+						tank->move(baseEntrance->getSides().second);
+					}
 				}
 			}
 			else
