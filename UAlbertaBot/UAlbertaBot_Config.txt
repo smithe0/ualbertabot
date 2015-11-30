@@ -1,9 +1,9 @@
 {
     "Bot Info" :
     {
-        "BotName"                   : "HeyPeter",
-        "Authors"                   : "Not David Churchill",
-        "PrintInfoOnStart"          : false
+        "BotName"                   : "TotaliTerranBot",
+        "Authors"                   : "Julie Wang, Eric Smith, Blaz Pocrnja, Hugh Craig",
+        "PrintInfoOnStart"          : true
     },
         
     "BWAPI" : 
@@ -78,7 +78,7 @@
     
     "Strategy" :
     {
-        "Protoss"                   : "Protoss_DTRush",
+        "Protoss"                   : "Protoss_Drop",
         "Terran"                    : "Terran_TankPush",
         "Zerg"                      : "Zerg_3HatchMuta",
         
