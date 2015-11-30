@@ -2,9 +2,9 @@
 #include "BuildingManager.h"
 #include "Micro.h"
 #include "ScoutManager.h"
-
+#include "InformationManager.h"
 using namespace UAlbertaBot;
-
+using namespace SparCraft;
 BuildingManager::BuildingManager()
     : _debugMode(false)
     , _reservedMinerals(0)
@@ -22,6 +22,7 @@ void BuildingManager::update()
     checkForStartedConstruction();          // check to see if any buildings have started construction and update data structures    
     checkForDeadTerranBuilders();           // if we are terran and a building is under construction without a worker, assign a new one    
     checkForCompletedBuildings();           // check to see if any buildings have completed and update data structures
+	SweepEnemyBase();
 }
 
 bool BuildingManager::isBeingBuilt(BWAPI::UnitType type)
@@ -222,15 +223,16 @@ void BuildingManager::checkForStartedConstruction()
 
 // STEP 5: IF WE ARE TERRAN, THIS MATTERS, SO: LOL
 void BuildingManager::checkForDeadTerranBuilders() {
-	for (auto & b : _buildings)
+	/*for (auto & b : _buildings)
 	{
-		if (b.status == BuildingStatus::Assigned && WorkerManager::Instance().isBuilder(b.buildingUnit) == false && b.status == BuildingStatus::UnderConstruction )
+		if (b.status == BuildingStatus::Assigned && b.buildingUnit->exists() == false && !b.buildingUnit->isCompleted())
 		{
 			b.status = BuildingStatus::Unassigned;
-			b.builderUnit = nullptr;
+		
 		}
 
 	}
+	*/
 
 }
 
@@ -461,22 +463,34 @@ void BuildingManager::removeBuildings(const std::vector<Building> & toRemove)
         }
     }
 }
-void BuildingManager::SweepEnemyBase(){
-	for (auto & u : BWAPI::Broodwar->self()->getUnits()){
-		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) {
-			if (u->getEnergy() >= 150) {
+void BuildingManager::SweepEnemyBase()
+{
 
-				BWAPI::UnitCommand::useTech(u, BWAPI::TechTypes::Scanner_Sweep, BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation()));
+	for (auto & u : BWAPI::Broodwar->self()->getUnits())
+	{
+		printf("overhere!!!");
+		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) 
+		{
+			if (u->getEnergy() >= 150) 
+			{
+				u->useTech(BWAPI::TechTypes::Scanner_Sweep, BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation()));
+				//BWAPI::UnitCommand::useTech(u, BWAPI::TechTypes::Scanner_Sweep, BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation()));
 			}
 		}
 	}
 }
-void BuildingManager::SweepAroundUnit(BWAPI::Unit unit){
-	for (auto & u : BWAPI::Broodwar->self()->getUnits()){
-		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) {
-			if (u->getEnergy() >= 50) {
+void BuildingManager::SweepAroundUnit(BWAPI::Unit unit)
+{
+	if (unit->isUnderAttack() /*&& WorkerManager::Instance().getClosestEnemyUnit(unit).BWAPI::UnitType::hasPermanentCloak() == true*/){
+		for (auto & u : BWAPI::Broodwar->self()->getUnits())
+		{
+			if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) 
+			{
+				if (u->getEnergy() >= 50) 
+				{
+					u->useTech(BWAPI::TechTypes::Scanner_Sweep, unit->getPosition());
 
-				BWAPI::UnitCommand::useTech(u, BWAPI::TechTypes::Scanner_Sweep, unit->getPosition());
+				}
 			}
 		}
 	}
