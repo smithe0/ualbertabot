@@ -145,8 +145,17 @@ void CombatCommander::updateAttackSquads()
         }
     }
 
-    SquadOrder mainAttackOrder(SquadOrderTypes::Attack, getMainAttackLocation(), 800, "Attack Enemy Base");
-    mainAttackSquad.setSquadOrder(mainAttackOrder);
+	BWAPI::Unitset attackunits = mainAttackSquad.getUnits();
+
+	//Make sure there are enough units before rushing the base
+	if (attackunits.size() >= 3){
+		SquadOrder mainAttackOrder(SquadOrderTypes::Attack, getMainAttackLocation(), 800, "Attack Enemy Base");
+		mainAttackSquad.setSquadOrder(mainAttackOrder);
+	}
+	else{
+		SquadOrder mainAttackOrder(SquadOrderTypes::Regroup, getDefendLocation(), 800, "Gather strength");
+		mainAttackSquad.setSquadOrder(mainAttackOrder);
+	}
 }
 
 void CombatCommander::updateDropSquads()
