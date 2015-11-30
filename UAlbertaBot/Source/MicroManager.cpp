@@ -61,12 +61,6 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 		}
 	}
 
-	// if this is a base defense tank squad then we only care about units in the entrance area
-	//if (order.getType() == SquadOrderTypes::BaseDefense)
-	//{
-	//	executeMicro(nearbyEnemies);
-	//}
-
 	// the following block of code attacks all units on the way to the order position
 	// we want to do this if the order is attack, defend, or harass
 	if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::BaseDefense) 

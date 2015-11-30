@@ -1,8 +1,8 @@
 {
     "Bot Info" :
     {
-        "BotName"                   : "UAlbertaBot",
-        "Authors"                   : "David Churchill",
+        "BotName"                   : "HeyPeter",
+        "Authors"                   : "Not David Churchill",
         "PrintInfoOnStart"          : false
     },
         
@@ -11,7 +11,7 @@
         "SetLocalSpeed"             : 10,
         "SetFrameSkip"              : 7,
         "UserInput"                 : true,
-        "CompleteMapInformation"    : false
+        "CompleteMapInformation"    : true
     },
     
     "Micro" :
@@ -52,7 +52,7 @@
         "DrawUnitTargetInfo"        : false,
         "DrawBWTAInfo"              : false,
         "DrawMapGrid"               : false,
-        "DrawSquadInfo"             : true,
+        "DrawSquadInfo"             : false,
         "DrawWorkerInfo"            : false,
         "DrawMouseCursorInfo"       : false,
         "DrawBuildingInfo"          : false,
@@ -78,7 +78,7 @@
     
     "Strategy" :
     {
-        "Protoss"                   : "Protoss_ZealotRush",
+        "Protoss"                   : "Protoss_DTRush",
         "Terran"                    : "Terran_TankPush",
         "Zerg"                      : "Zerg_3HatchMuta",
         
