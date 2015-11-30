@@ -2,13 +2,12 @@
 #include "BuildingManager.h"
 #include "Micro.h"
 #include "ScoutManager.h"
-<<<<<<< HEAD
+
 #include "InformationManager.h"
-=======
 #include "UnitUtil.h"
 #include "WorkerManager.h"
 
->>>>>>> 7809f32e2895b3c784864bd1452b1e65a7c9ef8f
+
 using namespace UAlbertaBot;
 using namespace SparCraft;
 BuildingManager::BuildingManager()
@@ -229,7 +228,7 @@ void BuildingManager::checkForStartedConstruction()
 
 // STEP 5: IF WE ARE TERRAN, THIS MATTERS, SO: LOL
 void BuildingManager::checkForDeadTerranBuilders() {
-<<<<<<< HEAD
+
 	/*for (auto & b : _buildings)
 	{
 		if (b.status == BuildingStatus::Assigned && b.buildingUnit->exists() == false && !b.buildingUnit->isCompleted())
@@ -240,7 +239,7 @@ void BuildingManager::checkForDeadTerranBuilders() {
 
 	}
 	*/
-=======
+
     /*if(auto b : _buildings) {
         if (b.status != BuildingStatus::UnderConstruction && UnitUtil::Instance().onUnitDestroy(b.builderUnit)) {
             b.status = BuildingStatus::Unassigned;
@@ -251,15 +250,16 @@ void BuildingManager::checkForDeadTerranBuilders() {
         }
     }*/
     
-	for (Building &b: _buildings) {
+	/*for (Building &b: _buildings) {
 		if (b.status != BuildingStatus::UnderConstruction && WorkerManager::Instance().checkPreviousWorkers(b.builderUnit)==true) {
 			b.status = BuildingStatus::Unassigned;
 			assignWorkersToUnassignedBuildings();
 
 
 		}
-	}
->>>>>>> 7809f32e2895b3c784864bd1452b1e65a7c9ef8f
+	}*/
+
+
 
 }
 
@@ -490,7 +490,7 @@ void BuildingManager::removeBuildings(const std::vector<Building> & toRemove)
         }
     }
 }
-<<<<<<< HEAD
+
 void BuildingManager::SweepEnemyBase()
 {
 
@@ -509,7 +509,7 @@ void BuildingManager::SweepEnemyBase()
 }
 void BuildingManager::SweepAroundUnit(BWAPI::Unit unit)
 {
-	if (unit->isUnderAttack() /*&& WorkerManager::Instance().getClosestEnemyUnit(unit).BWAPI::UnitType::hasPermanentCloak() == true*/){
+	if (unit->isUnderAttack() && WorkerManager::Instance().getClosestEnemyUnit(unit)->isCloaked() == true){
 		for (auto & u : BWAPI::Broodwar->self()->getUnits())
 		{
 			if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) 
@@ -524,5 +524,4 @@ void BuildingManager::SweepAroundUnit(BWAPI::Unit unit)
 	}
 }
 
-=======
->>>>>>> 7809f32e2895b3c784864bd1452b1e65a7c9ef8f
+
