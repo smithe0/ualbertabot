@@ -26,6 +26,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 		// train sub units such as scarabs or interceptors
 		//trainSubUnits(rangedUnit);
 
+		
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend) 
         {
@@ -61,12 +62,53 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
-				// if we're not near the order position
-				if (rangedUnit->getDistance(order.getPosition()) > 100)
+
+				//Lay spider mines in chokepoints
+				if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Vulture && rangedUnit->getSpiderMineCount() > 0)
 				{
-					// move to it
-					Micro::SmartAttackMove(rangedUnit, order.getPosition());
+					
+					bool nearChoke = false;
+					BWAPI::Position chokeMid = rangedUnit->getPosition();
+
+					BWAPI::Position base = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+					BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(base);
+					
+
+					for (BWTA::Chokepoint * choke : BWTA::getChokepoints())
+					{
+						if (rangedUnit->getDistance(choke->getCenter()) < 80 && choke->getCenter() != baseEntrance->getCenter())
+						{
+							nearChoke = true;
+							chokeMid = choke->getCenter();
+							break;
+						}
+					}
+
+					if (nearChoke){
+						Micro::SmartLaySpiderMine(rangedUnit, rangedUnit->getPosition());		
+					}
+					else{
+
+						// if we're not near the order position
+						if (rangedUnit->getDistance(order.getPosition()) > 100)
+						{
+							// move to it
+							Micro::SmartAttackMove(rangedUnit, order.getPosition());
+						}
+					}
+					
 				}
+				
+				else
+				{
+					// if we're not near the order position
+					if (rangedUnit->getDistance(order.getPosition()) > 100)
+					{
+						// move to it
+						Micro::SmartAttackMove(rangedUnit, order.getPosition());
+					}
+				}
+
 			}
 		}
 	}
