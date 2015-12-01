@@ -39,24 +39,23 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	// for each detectorUnit
 	for (auto & detectorUnit : detectorUnits)
 	{
-		if (detectorUnit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel){
+		/*if (detectorUnit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel){
 			BWAPI::Broodwar->printf("science vessel exists");
 			Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
+		}*/
+
+		// if we need to regroup, move the detectorUnit to that location
+		if (!detectorUnitInBattle && unitClosestToEnemy && unitClosestToEnemy->getPosition().isValid())
+		{
+			Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
+			detectorUnitInBattle = true;
 		}
-		else{
-			// if we need to regroup, move the detectorUnit to that location
-			if (!detectorUnitInBattle && unitClosestToEnemy && unitClosestToEnemy->getPosition().isValid())
-			{
-				Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
-				detectorUnitInBattle = true;
-			}
-			// otherwise there is no battle or no closest to enemy so we don't want our detectorUnit to die
-			// send him to scout around the map
-			else
-			{
-				BWAPI::Position explorePosition = MapGrid::Instance().getLeastExplored();
-				Micro::SmartMove(detectorUnit, explorePosition);
-			}
+		// otherwise there is no battle or no closest to enemy so we don't want our detectorUnit to die
+		// send him to scout around the map
+		else
+		{
+			BWAPI::Position explorePosition = MapGrid::Instance().getLeastExplored();
+			Micro::SmartMove(detectorUnit, explorePosition);
 		}
 	}
 }

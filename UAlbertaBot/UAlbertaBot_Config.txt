@@ -1,26 +1,15 @@
 {
     "Bot Info" :
     {
-<<<<<<< HEAD
         "BotName"                   : "TotaliTerranBot",
         "Authors"                   : "Julie Wang, Eric Smith, Blaz Pocrnja, Hugh Craig",
         "PrintInfoOnStart"          : true
-=======
-        "BotName"                   : "UAlbertaBot2",
-        "Authors"                   : "David Churchill",
-        "PrintInfoOnStart"          : false
->>>>>>> bunkers
     },
         
     "BWAPI" : 
     {
-<<<<<<< HEAD
         "SetLocalSpeed"             : 10,
         "SetFrameSkip"              : 7,
-=======
-        "SetLocalSpeed"             : 20,
-        "SetFrameSkip"              : 2,
->>>>>>> bunkers
         "UserInput"                 : true,
         "CompleteMapInformation"    : false
     },

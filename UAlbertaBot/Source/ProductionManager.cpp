@@ -118,22 +118,22 @@ void ProductionManager::update()
 			    _queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Engineering_Bay), true);
 		    }
 
-			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Science_Vessel) == 0){
-				_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Science_Vessel), true);
+			//if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Science_Vessel) == 0){
+			//	_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Science_Vessel), true);
 
-				if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Science_Facility) == 0){
-					_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Science_Facility), true);
+			//	if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Science_Facility) == 0){
+			//		_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Science_Facility), true);
 
-					if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Control_Tower) == 0){
-						_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Control_Tower), true);
+			//		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Control_Tower) == 0){
+			//			_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Control_Tower), true);
 
-						if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Starport) == 0){
-							_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Starport), true);
-						}
-					}
-				}
+			//			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Starport) == 0){
+			//				_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Starport), true);
+			//			}
+			//		}
+			//	}
 
-			}
+			//}
         }
         
         if (Config::Debug::DrawBuildOrderSearchInfo)
