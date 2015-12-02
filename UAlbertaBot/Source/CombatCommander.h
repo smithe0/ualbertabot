@@ -15,9 +15,10 @@ class CombatCommander
     bool            _initialized;
 
     void            updateScoutDefenseSquad();
-	void			updateBaseDefenseSquad();
+	void			updateSiegeDefenseSquad();
 	void            updateDefenseSquads();
 	void            updateAttackSquads();
+	void			updateBunkerSquads();
     void            updateDropSquads();
 	void            updateIdleSquad();
 	bool            isSquadUpdateFrame();
@@ -30,7 +31,7 @@ class CombatCommander
 
 	BWAPI::Position getDefendLocation();
     BWAPI::Position getMainAttackLocation();
-	BWAPI::Position getBaseDefenseLocation();
+	BWAPI::Position getSiegeDefenseLocation();
 
 	
 
@@ -43,7 +44,7 @@ class CombatCommander
 
     void            updateDefenseSquadUnits(Squad & defenseSquad, const size_t & flyingDefendersNeeded, const size_t & groundDefendersNeeded);
     int             defendWithWorkers();
-	void			updateBunkerSquads();
+
 
     int             numZerglingsInOurBase();
     bool            beingBuildingRushed();

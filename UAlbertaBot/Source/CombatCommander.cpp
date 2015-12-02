@@ -6,6 +6,7 @@ using namespace UAlbertaBot;
 const size_t IdlePriority = 0;
 const size_t AttackPriority = 1;
 const size_t BunkerSquadPriority = 2;
+const size_t SiegeDefensePriority = 2;
 const size_t BaseDefensePriority = 3;
 const size_t ScoutDefensePriority = 4;
 const size_t DropPriority = 5;
@@ -18,6 +19,9 @@ CombatCommander::CombatCommander()
 
 void CombatCommander::initializeSquads()
 {
+	BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
+
     SquadOrder idleOrder(SquadOrderTypes::Idle, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()), 100, "Chill Out");
 	_squadData.addSquad("Idle", Squad("Idle", idleOrder, IdlePriority));
 
@@ -26,18 +30,15 @@ void CombatCommander::initializeSquads()
 	_squadData.addSquad("MainAttack", Squad("MainAttack", mainAttackOrder, AttackPriority));
 
 	// the base defense squad that consists of tanks in siege mode
-    BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
-	BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
-	SquadOrder tankBaseDefense(SquadOrderTypes::BaseDefense, baseEntrance->getCenter(), 100, "Defend base entrance");
-	_squadData.addSquad("BaseDefense", Squad("BaseDefense", tankBaseDefense, BaseDefensePriority));
+	SquadOrder siegeDefenseOrder(SquadOrderTypes::SiegeDefense, baseEntrance->getCenter(), 100, "Defend base entrance");
+	_squadData.addSquad("SiegeDefense", Squad("SiegeDefense", siegeDefenseOrder, BaseDefensePriority));
 
     // the scout defense squad will handle chasing the enemy worker scout
     SquadOrder enemyScoutDefense(SquadOrderTypes::Defend, ourBasePosition, 900, "Get the scout");
     _squadData.addSquad("ScoutDefense", Squad("ScoutDefense", enemyScoutDefense, ScoutDefensePriority));
 
 	// the bunker squad will defend the base
-	BWTA::Chokepoint *entrance = BWTA::getNearestChokepoint(ourBasePosition);
-	SquadOrder mainBunkerSquad(SquadOrderTypes::BunkerSquad, entrance->getCenter(), 300, "Sit in bunker");
+	SquadOrder mainBunkerSquad(SquadOrderTypes::BunkerSquad, baseEntrance->getCenter(), 300, "Sit in bunker");
 	_squadData.addSquad("BunkerDefense", Squad("BunkerDefense", mainBunkerSquad, BunkerSquadPriority));
 
     // add a drop squad if we are using a drop strategy
@@ -75,7 +76,7 @@ void CombatCommander::update(const BWAPI::Unitset & combatUnits)
         updateIdleSquad();
         updateDropSquads();
         updateScoutDefenseSquad();
-		updateBaseDefenseSquad();
+		updateSiegeDefenseSquad();
 		updateDefenseSquads();
 		updateAttackSquads();
 		updateBunkerSquads();
@@ -97,9 +98,9 @@ void CombatCommander::updateIdleSquad()
     }
 }
 
-void CombatCommander::updateBaseDefenseSquad()
+void CombatCommander::updateSiegeDefenseSquad()
 {
-	Squad & baseDefenseSquad = _squadData.getSquad("BaseDefense");
+	Squad & baseDefenseSquad = _squadData.getSquad("SiegeDefense");
 	const int NUM_OF_SIEGE_DEFENDERS = 3; // number of siege mode tanks near entrance ( can change to liking ) 
 	auto  & baseDefenseUnits = baseDefenseSquad.getUnits();
 
@@ -115,7 +116,7 @@ void CombatCommander::updateBaseDefenseSquad()
 		int currentNumSiegeDef = baseDefenseUnits.size();
 		while (currentNumSiegeDef < NUM_OF_SIEGE_DEFENDERS)
 		{
-			auto nearestSiegeTank = findClosestSiegeDefender(baseDefenseSquad, getBaseDefenseLocation());
+			auto nearestSiegeTank = findClosestSiegeDefender(baseDefenseSquad, getSiegeDefenseLocation());
 			if (nearestSiegeTank)
 			{
 				_squadData.assignUnitToSquad(nearestSiegeTank, baseDefenseSquad);
@@ -129,8 +130,8 @@ void CombatCommander::updateBaseDefenseSquad()
 		}
 	}
 
-	SquadOrder baseDefenseOrder(SquadOrderTypes::BaseDefense, getBaseDefenseLocation(), 100, "Defend base entrace");
-	baseDefenseSquad.setSquadOrder(baseDefenseOrder);
+	SquadOrder siegeDefenseOrder(SquadOrderTypes::SiegeDefense, getSiegeDefenseLocation(), 100, "Defend base entrace");
+	baseDefenseSquad.setSquadOrder(siegeDefenseOrder);
 }
 
 
@@ -602,7 +603,7 @@ BWAPI::Position CombatCommander::getDefendLocation()
 	return BWTA::getRegion(BWTA::getStartLocation(BWAPI::Broodwar->self())->getTilePosition())->getCenter();
 }
 
-BWAPI::Position CombatCommander::getBaseDefenseLocation()
+BWAPI::Position CombatCommander::getSiegeDefenseLocation()
 {
 	BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
 	BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
