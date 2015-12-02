@@ -26,7 +26,7 @@ void TankManager::executeSiegeDefense(const BWAPI::Unitset & targets)
 
 	for (auto & tank : tanks)
 	{
-		if (order.getType() == SquadOrderTypes::BaseDefense)
+		if (order.getType() == SquadOrderTypes::SiegeDefense)
 		{
 			// if the tanks distance to the base entrance is > 64, then move the tank into position 
 			if (tank->getDistance(baseEntrance->getCenter()) > 170)
@@ -88,7 +88,7 @@ void TankManager::executeSiegeDefense(const BWAPI::Unitset & targets)
 
 void TankManager::executeMicro(const BWAPI::Unitset & targets) 
 {
-	if (order.getType() == SquadOrderTypes::BaseDefense)
+	if (order.getType() == SquadOrderTypes::SiegeDefense)
 	{
 		executeSiegeDefense(targets);
 		return;
