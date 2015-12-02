@@ -334,8 +334,7 @@ void ProductionManager::create(BWAPI::Unit producer, BuildOrderItem & item)
     }
 
     MetaType t = item.metaType;
-	BWAPI::Position ourBuildingLocation = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
-	BWTA::Chokepoint *chokeLocation = BWTA::getNearestChokepoint(ourBuildingLocation);
+
     // if we're dealing with a building
     if (t.isUnit() && t.getUnitType().isBuilding()
         && t.getUnitType() != BWAPI::UnitTypes::Zerg_Lair 
@@ -344,7 +343,8 @@ void ProductionManager::create(BWAPI::Unit producer, BuildOrderItem & item)
         && !t.getUnitType().isAddon())
     {
 		if (t.getUnitType() == BWAPI::UnitTypes::Terran_Missile_Turret){
-			
+			BWAPI::Position ourBuildingLocation = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+			BWTA::Chokepoint *chokeLocation = BWTA::getNearestChokepoint(ourBuildingLocation);
 			BuildingManager::Instance().addBuildingTask(t.getUnitType(),BWAPI::TilePosition(chokeLocation->getCenter()), item.isGasSteal);
 
 		}
