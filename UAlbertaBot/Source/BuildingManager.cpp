@@ -104,7 +104,6 @@ void BuildingManager::assignWorkersToUnassignedBuildings()
 
             // reserve this building's space
             BuildingPlacer::Instance().reserveTiles(b.finalPosition,b.type.tileWidth(),b.type.tileHeight());
-
             b.status = BuildingStatus::Assigned;
         }
     }
@@ -251,7 +250,7 @@ void BuildingManager::checkForDeadTerranBuilders() {
     }*/
     
 	/*for (Building &b: _buildings) {
-		if (b.status != BuildingStatus::UnderConstruction && WorkerManager::Instance().checkPreviousWorkers(b.builderUnit)==true) {
+		if (b.buildingUnit->exists()==false) {
 			b.status = BuildingStatus::Unassigned;
 			assignWorkersToUnassignedBuildings();
 
@@ -517,11 +516,10 @@ void BuildingManager::SweepAroundUnit(BWAPI::Unit unit)
 				if (u->getEnergy() >= 50) 
 				{
 					u->useTech(BWAPI::TechTypes::Scanner_Sweep, unit->getPosition());
-
+					//isvisible
 				}
 			}
 		}
 	}
 }
-
 

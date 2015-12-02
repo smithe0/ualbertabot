@@ -85,18 +85,19 @@ void ProductionManager::update()
 			    _queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Protoss_Forge), true);
 		    }
         }
-        else if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Terran)
+		else if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Terran)
         {
-            if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Missile_Turret) < 2)
+            /*if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Missile_Turret) < 2)
 		    {
 			    _queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Missile_Turret), true);
 			    _queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Missile_Turret), true);
+
 		    }
 
 		    if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Engineering_Bay) == 0)
 		    {
 			    _queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Engineering_Bay), true);
-		    }
+		    }*/
         }
         
         if (Config::Debug::DrawBuildOrderSearchInfo)
@@ -335,14 +336,23 @@ void ProductionManager::create(BWAPI::Unit producer, BuildOrderItem & item)
     MetaType t = item.metaType;
 
     // if we're dealing with a building
-    if (t.isUnit() && t.getUnitType().isBuilding() 
+    if (t.isUnit() && t.getUnitType().isBuilding()
         && t.getUnitType() != BWAPI::UnitTypes::Zerg_Lair 
         && t.getUnitType() != BWAPI::UnitTypes::Zerg_Hive
         && t.getUnitType() != BWAPI::UnitTypes::Zerg_Greater_Spire
         && !t.getUnitType().isAddon())
     {
+		if (t.getUnitType() == BWAPI::UnitTypes::Terran_SCV){
+			BWAPI::Position ourBuildingLocation = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+			BWTA::Chokepoint *chokeLocation = BWTA::getNearestChokepoint(ourBuildingLocation);
+			
+			BuildingManager::Instance().addBuildingTask(t.getUnitType(),BWAPI::TilePosition(chokeLocation->getCenter()), item.isGasSteal);
+			
+		}
         // send the building task to the building manager
-        BuildingManager::Instance().addBuildingTask(t.getUnitType(), BWAPI::Broodwar->self()->getStartLocation(), item.isGasSteal);
+		else {
+			BuildingManager::Instance().addBuildingTask(t.getUnitType(), BWAPI::Broodwar->self()->getStartLocation(), item.isGasSteal);
+		}
     }
     else if (t.getUnitType().isAddon())
     {

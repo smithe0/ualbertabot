@@ -46,7 +46,6 @@ public:
 	void				SweepAroundUnit(BWAPI::Unit unit);
     int                 getReservedMinerals();
     int                 getReservedGas();
-
     bool                isBeingBuilt(BWAPI::UnitType type);
 
     std::vector<BWAPI::UnitType> buildingsQueued();
