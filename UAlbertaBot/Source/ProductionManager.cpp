@@ -93,11 +93,17 @@ void ProductionManager::update()
 			    _queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Missile_Turret), true);
 
 		    }
+			if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Comsat_Station) == 0) {
+				_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Comsat_Station), true);
+				_queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Academy), true);
+
+			}
 
 		    if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::Terran_Engineering_Bay) == 0)
 		    {
 			    _queue.queueAsHighestPriority(MetaType(BWAPI::UnitTypes::Terran_Engineering_Bay), true);
 		    }
+			
         }
         
         if (Config::Debug::DrawBuildOrderSearchInfo)
