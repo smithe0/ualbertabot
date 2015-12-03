@@ -7,7 +7,7 @@ namespace Config
     {
         bool ConfigFileFound                = false;
         bool ConfigFileParsed               = false;
-        std::string ConfigFileLocation      = "C:\\Users\\Hugh\\Documents\\CMPUT350\\starcraftbot\\ualbertabot\\UAlbertaBot\\UAlbertaBot_Config.txt";
+        std::string ConfigFileLocation      = "C:/Users/Hugh/Documents/CMPUT350/starcraftbot/ualbertabot/UAlbertaBot/UAlbertaBot_Config.txt";
     }
 
     namespace Strategy
