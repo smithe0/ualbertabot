@@ -27,7 +27,7 @@ void BuildingManager::update()
     checkForStartedConstruction();          // check to see if any buildings have started construction and update data structures    
     checkForDeadTerranBuilders();           // if we are terran and a building is under construction without a worker, assign a new one    
     checkForCompletedBuildings();           // check to see if any buildings have completed and update data structures
-	SweepEnemyBase();
+	SweepHomeBase();
 }
 
 bool BuildingManager::isBeingBuilt(BWAPI::UnitType type)
@@ -490,17 +490,17 @@ void BuildingManager::removeBuildings(const std::vector<Building> & toRemove)
     }
 }
 
-void BuildingManager::SweepEnemyBase()
+
+void BuildingManager::SweepHomeBase()
 {
 
 	for (auto & u : BWAPI::Broodwar->self()->getUnits())
 	{
-		printf("overhere!!!");
-		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station) 
+		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station)
 		{
-			if (u->getEnergy() >= 150) 
+			if (u->getEnergy() >= 150)
 			{
-				u->useTech(BWAPI::TechTypes::Scanner_Sweep, BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation()));
+				u->useTech(BWAPI::TechTypes::Scanner_Sweep, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
 				//BWAPI::UnitCommand::useTech(u, BWAPI::TechTypes::Scanner_Sweep, BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation()));
 			}
 		}
