@@ -53,6 +53,7 @@ public:
     void        drawProductionInformation(int x,int y);
     void        setSearchGoal(MetaPairVector & goal);
     void        queueGasSteal();
+	void		buildBunker();
 
     BWAPI::Unit getProducer(MetaType t,BWAPI::Position closestTo = BWAPI::Positions::None);
 };

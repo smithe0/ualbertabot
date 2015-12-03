@@ -1,4 +1,5 @@
 #include "RangedManager.h"
+#include "BuildingManager.h"
 #include "UnitUtil.h"
 
 using namespace UAlbertaBot;
@@ -7,8 +8,81 @@ RangedManager::RangedManager()
 { 
 }
 
-void RangedManager::executeMicro(const BWAPI::Unitset & targets) 
+void RangedManager::executeBunkerDefense(const BWAPI::Unitset & targets)
 {
+	const BWAPI::Unitset & marines = getUnits();
+
+	// figure out targets
+	BWAPI::Unitset rangedUnitTargets;
+	std::copy_if(targets.begin(), targets.end(), std::inserter(rangedUnitTargets, rangedUnitTargets.end()), 
+		[](BWAPI::Unit u){ return u->isVisible(); });
+
+	//Get rally point for bunker squad
+	BWAPI::Position ourBasePosition = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+	BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(ourBasePosition);
+
+	//Get list of bunkers
+	BWAPI::Unitset bunkers;
+	std::copy_if(BWAPI::Broodwar->self()->getUnits().begin(),
+		BWAPI::Broodwar->self()->getUnits().end(),
+		std::inserter(bunkers, bunkers.end()),
+		[](BWAPI::Unit u){return u->getType() == BWAPI::UnitTypes::Terran_Bunker; });
+
+	//Get enemy base position
+	auto enemyBase = BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation());
+
+	//Find bunker closest to enemy base
+	auto minBunk = *bunkers.begin();
+	auto minDist = std::numeric_limits<int>::max();
+	for (auto &bunk : bunkers){
+		if (bunk->getDistance(enemyBase) < minDist){
+			minBunk = bunk;
+			minDist = bunk->getDistance(enemyBase);
+		}
+	}
+
+	//Order each marine
+	for (auto & marine : marines)
+	{
+		if (order.getType() == SquadOrderTypes::BunkerSquad)
+		{
+			Micro::SmartRightClick(marine, minBunk);
+
+			// if there are targets
+			if (!rangedUnitTargets.empty())
+			{
+				BWAPI::Unit target = getTarget(marine, rangedUnitTargets);
+
+				if (target && Config::Debug::DrawUnitTargetInfo)
+				{
+					BWAPI::Broodwar->drawLineMap(marine->getPosition(), marine->getTargetPosition(), BWAPI::Colors::Purple);
+				}
+				
+				Micro::SmartAttackUnit(marine, target);
+			}
+
+			// if there are no targets
+			else
+			{
+				continue;
+				// if we're not near the order position
+				if (marine->getDistance(order.getPosition()) > 100)
+				{
+					//Move to it
+					Micro::SmartAttackMove(marine, order.getPosition());
+				}
+			}
+		}
+	}
+	
+}
+void RangedManager::executeMicro(const BWAPI::Unitset & targets)
+{
+	if (order.getType() == SquadOrderTypes::BunkerSquad)
+	{
+		executeBunkerDefense(targets);
+		return;
+	}
 	assignTargetsOld(targets);
 }
 
@@ -26,6 +100,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 		// train sub units such as scarabs or interceptors
 		//trainSubUnits(rangedUnit);
 
+		
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend) 
         {
@@ -61,12 +136,53 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
-				// if we're not near the order position
-				if (rangedUnit->getDistance(order.getPosition()) > 100)
+
+				//Lay spider mines in chokepoints
+				if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Vulture && rangedUnit->getSpiderMineCount() > 0)
 				{
-					// move to it
-					Micro::SmartAttackMove(rangedUnit, order.getPosition());
+					
+					bool nearChoke = false;
+					BWAPI::Position chokeMid = rangedUnit->getPosition();
+
+					BWAPI::Position base = BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation());
+					BWTA::Chokepoint *baseEntrance = BWTA::getNearestChokepoint(base);
+					
+
+					for (BWTA::Chokepoint * choke : BWTA::getChokepoints())
+					{
+						if (rangedUnit->getDistance(choke->getCenter()) < 80 && choke->getCenter() != baseEntrance->getCenter())
+						{
+							nearChoke = true;
+							chokeMid = choke->getCenter();
+							break;
+						}
+					}
+
+					if (nearChoke){
+						Micro::SmartLaySpiderMine(rangedUnit, rangedUnit->getPosition());		
+					}
+					else{
+
+						// if we're not near the order position
+						if (rangedUnit->getDistance(order.getPosition()) > 100)
+						{
+							// move to it
+							Micro::SmartAttackMove(rangedUnit, order.getPosition());
+						}
+					}
+					
 				}
+				
+				else
+				{
+					// if we're not near the order position
+					if (rangedUnit->getDistance(order.getPosition()) > 100)
+					{
+						// move to it
+						Micro::SmartAttackMove(rangedUnit, order.getPosition());
+					}
+				}
+
 			}
 		}
 	}

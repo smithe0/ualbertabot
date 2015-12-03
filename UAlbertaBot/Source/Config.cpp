@@ -7,7 +7,7 @@ namespace Config
     {
         bool ConfigFileFound                = false;
         bool ConfigFileParsed               = false;
-        std::string ConfigFileLocation      = "bwapi-data/AI/UAlbertaBot_Config.txt";
+        std::string ConfigFileLocation      = "C:\\Users\\Hugh\\Documents\\CMPUT350\\starcraftbot\\ualbertabot\\UAlbertaBot\\UAlbertaBot_Config.txt";
     }
 
     namespace Strategy
@@ -41,8 +41,8 @@ namespace Config
 
     namespace BotInfo
     {
-        std::string BotName                 = "UAlbertaBot";
-        std::string Authors                 = "Dave Churchill";
+        std::string BotName                 = "TotaliTerranBot";
+        std::string Authors                 = "Julie Wang, Eric Smith, Blaz Pocrnja, Hugh Craig";
         bool PrintInfoOnStart               = false;
     }
 

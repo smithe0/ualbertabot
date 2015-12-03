@@ -182,7 +182,14 @@ void Micro::SmartLaySpiderMine(BWAPI::Unit unit, BWAPI::Position pos)
         return;
     }
 
-    unit->canUseTechPosition(BWAPI::TechTypes::Spider_Mines, pos);
+	if (!unit->canUseTechPosition(BWAPI::TechTypes::Spider_Mines, pos))
+	{
+		return;
+	}
+	
+	//BWAPI::Broodwar->printf("Spider Mine Planted");
+	unit->useTech(BWAPI::TechTypes::Spider_Mines, pos);
+	
 }
 
 void Micro::SmartRepair(BWAPI::Unit unit, BWAPI::Unit target)

@@ -15,18 +15,25 @@ class CombatCommander
     bool            _initialized;
 
     void            updateScoutDefenseSquad();
+	void			updateSiegeDefenseSquad();
 	void            updateDefenseSquads();
 	void            updateAttackSquads();
+	void			updateBunkerSquads();
     void            updateDropSquads();
 	void            updateIdleSquad();
 	bool            isSquadUpdateFrame();
 	int             getNumType(BWAPI::Unitset & units, BWAPI::UnitType type);
 
 	BWAPI::Unit     findClosestDefender(const Squad & defenseSquad, BWAPI::Position pos, bool flyingDefender);
+	BWAPI::Unit		findClosestSiegeDefender(const Squad & baseDefenseSquad, BWAPI::Position pos);
     BWAPI::Unit     findClosestWorkerToTarget(BWAPI::Unitset & unitsToAssign, BWAPI::Unit target);
+	BWAPI::Unit		findClosestMarine(const Squad & defenseSquad, BWAPI::Position pos);
 
 	BWAPI::Position getDefendLocation();
     BWAPI::Position getMainAttackLocation();
+	BWAPI::Position getSiegeDefenseLocation();
+
+	
 
     void            initializeSquads();
     void            verifySquadUniqueMembership();
@@ -37,6 +44,7 @@ class CombatCommander
 
     void            updateDefenseSquadUnits(Squad & defenseSquad, const size_t & flyingDefendersNeeded, const size_t & groundDefendersNeeded);
     int             defendWithWorkers();
+
 
     int             numZerglingsInOurBase();
     bool            beingBuildingRushed();

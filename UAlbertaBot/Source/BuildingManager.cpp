@@ -2,6 +2,8 @@
 #include "BuildingManager.h"
 #include "Micro.h"
 #include "ScoutManager.h"
+#include "ProductionManager.h"
+#include "BWAPI.h"
 
 using namespace UAlbertaBot;
 
@@ -427,6 +429,8 @@ BWAPI::TilePosition BuildingManager::getBuildingLocation(const Building & b)
         return tile;
     }
 
+	//if (b.type.isBunker)
+
     // set the building padding specifically
     int distance = b.type == BWAPI::UnitTypes::Protoss_Photon_Cannon ? 0 : Config::Macro::BuildingSpacing;
     if (b.type == BWAPI::UnitTypes::Protoss_Pylon && (numPylons < 3))
@@ -450,3 +454,4 @@ void BuildingManager::removeBuildings(const std::vector<Building> & toRemove)
         }
     }
 }
+

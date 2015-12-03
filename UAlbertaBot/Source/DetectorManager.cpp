@@ -39,6 +39,11 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	// for each detectorUnit
 	for (auto & detectorUnit : detectorUnits)
 	{
+		/*if (detectorUnit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel){
+			BWAPI::Broodwar->printf("science vessel exists");
+			Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
+		}*/
+
 		// if we need to regroup, move the detectorUnit to that location
 		if (!detectorUnitInBattle && unitClosestToEnemy && unitClosestToEnemy->getPosition().isValid())
 		{
