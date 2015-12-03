@@ -15,6 +15,7 @@
 #include <set>
 #include <map>
 #include <array>
+#include <random>
 
 #include <BWAPI.h>
 #include <BWTA.h>

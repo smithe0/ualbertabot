@@ -16,6 +16,11 @@ InformationManager & InformationManager::Instance()
 	return instance;
 }
 
+//Added getter for enemy
+BWAPI::Player InformationManager::getEnemy(){
+	return _enemy;
+}
+
 void InformationManager::update() 
 {
 	updateUnitInfo();

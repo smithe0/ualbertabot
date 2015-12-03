@@ -48,6 +48,8 @@ public:
 
     bool                isBeingBuilt(BWAPI::UnitType type);
 
+	void				buildBunker();
+
     std::vector<BWAPI::UnitType> buildingsQueued();
 };
 }
